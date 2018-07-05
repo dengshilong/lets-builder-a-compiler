@@ -1,66 +1,92 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/env python
-# @Time    : 16/12/29 下午1:03
-# @Author  : robinjia
-# @Email   : dengshilong1988@gmail.com
-
-
-
-#!/usr/bin/env python
-# vim: set fileencoding=utf8
-"""
-    ch01.cradle
-    ~~~~~~~~~~~
-
-    A framework of commonly-used routines for the Let's Build a Compiler (in Python)!
-    project.
-
-    :copyright: 2013 by Austin Hastings, see AUTHORS for more details.
-    :license: GPL v3+, see LICENSE for more details.
-"""
 import sys
-import io
-import pdb
 
-##### Error handling
 from io import StringIO
 
-
-def abort(msg):
-    pass
-
-def error(msg):
-    pass
-
-def expected(what):
-    pass
-
-##### Input handling
+_look = None
+_input = None
 
 def get_char():
+    """get a char to look"""
+    global _look
+    _look = _input.read(1) if sys.stdin.readable() else None
+
+
+def error(s):
+    """
+    report an error
+    """
+    sys.stderr.write("\n" + s + "\n")
+
+
+def abort(s):
+    """
+    report an error and raise a exception
+    """
+    error(s)
+    sys.exit(1)
     pass
 
-def get_number():
-    pass
 
-def get_word():
-    pass
+def expected(s):
+    """
+    report on an input value not present
+    """
+    abort("'%s' expected." % s)
 
 def match(ch):
-    pass
+    """
+    require that the next input read be the character given as a parameter.
+    abort if not found.
+    """
+    if _look == ch:
+        get_char()
+    else:
+        expected(ch)
 
-##### Output functions
 
-def emit(text):
-    pass
+def is_alpha(c):
+    """judge is a char"""
+    return (c.upper() >= 'A' and c.upper() <= 'Z')
 
-def emitln(text):
-    pass
 
-##### Processing
+def is_digit(c):
+    """judge is a digit"""
+    return c >= '0' and c <= '9'
+
+
+def get_name():
+    """get a name"""
+    global _look
+    if not is_alpha(_look):
+        expected('Name')
+    result = _look.upper()
+    get_char()
+    return result
+
+
+def get_num():
+    """get a number"""
+    global _look
+    if not is_digit(_look):
+        expected('Integer')
+    result = _look
+    get_char()
+    return result
+
+
+def emit(s):
+    sys.stdout.write(s)
+
+
+def emit_ln(s):
+    emit(s + '\n')
+
 
 def init(inp=None):
-    pass
+    global _input
+    _input = inp
+    get_char()
+
 
 def main():
     print("Enter your code on a single line. Enter '.' by itself to quit.")
@@ -69,7 +95,8 @@ def main():
         if line == ".":
             break
         init(inp=StringIO(line))
-        compile()
+        emit_ln(_look)
+
 
 if __name__ == '__main__':
     main()
