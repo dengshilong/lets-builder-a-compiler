@@ -93,6 +93,8 @@ def factor():
         match('(')
         expression()
         match(')')
+    elif is_alpha(_look):
+        emit_ln('MOVE ' + get_name() + '(PC),D0')
     else:
         emit_ln('MOVE #' + get_num() + ',D0')
 
