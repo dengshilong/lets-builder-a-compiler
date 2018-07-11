@@ -5,10 +5,35 @@ from io import StringIO
 _look = None
 _input = None
 
+
 def get_char():
     """get a char to look"""
     global _look
     _look = _input.read(1) if sys.stdin.readable() else None
+
+
+def is_alpha(c):
+    """judge is a char"""
+    return (c.upper() >= 'A' and c.upper() <= 'Z')
+
+
+def is_digit(c):
+    """judge is a digit"""
+    return c >= '0' and c <= '9'
+
+
+def is_al_num(c):
+    return is_alpha(c) or is_digit(c)
+
+
+def is_white(c):
+    return c in [' ']
+
+
+def skip_white():
+    global _look
+    while is_white(_look):
+        get_char()
 
 
 def error(s):
@@ -40,38 +65,35 @@ def match(ch):
     """
     if _look == ch:
         get_char()
+        skip_white()
     else:
         expected(ch)
-
-
-def is_alpha(c):
-    """judge is a char"""
-    return (c.upper() >= 'A' and c.upper() <= 'Z')
-
-
-def is_digit(c):
-    """judge is a digit"""
-    return c >= '0' and c <= '9'
 
 
 def get_name():
     """get a name"""
     global _look
+    token = ''
     if not is_alpha(_look):
         expected('Name')
-    result = _look.upper()
-    get_char()
-    return result
+    while is_al_num(_look):
+        token += _look.upper()
+        get_char()
+    skip_white()
+    return token
 
 
 def get_num():
     """get a number"""
     global _look
+    value = ''
     if not is_digit(_look):
         expected('Integer')
-    result = _look
-    get_char()
-    return result
+    while is_digit(_look):
+        value += _look
+        get_char()
+    skip_white()
+    return value
 
 
 def emit(s):
@@ -86,6 +108,7 @@ def init(inp=None):
     global _input
     _input = inp
     get_char()
+    skip_white()
 
 
 def ident():
