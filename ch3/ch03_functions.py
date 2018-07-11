@@ -87,8 +87,55 @@ def init(inp=None):
     _input = inp
     get_char()
 
+
+def ident():
+    name = get_name()
+    if _look == '(':
+        match('(')
+        match(')')
+        emit_ln('BSR ' + name)
+    else:
+        emit_ln('MOVE ' + name + '(PC),D0')
+
+
+def factor():
+    if _look == '(':
+        match('(')
+        expression()
+        match(')')
+    elif is_alpha(_look):
+        ident()
+    else:
+        emit_ln('MOVE #' + get_num() + ',D0')
+
+
+def multiply():
+    match('*')
+    factor()
+    emit_ln('MULS (SP)+,D0')
+
+
+def divide():
+    match('/')
+    factor()
+    emit_ln('MOVE (SP)+,D1')
+    emit_ln('DIVS D1,D0')
+
+
+def is_addop(c):
+    return c in ['-', '+']
+
+
 def term():
-    emit_ln('MOVE #' + get_num() + ',D0')
+    factor()
+    while _look in ['*', '/']:
+        emit_ln('MOVE D0,-(SP)')
+        if _look == '*':
+            multiply()
+        elif _look == '/':
+            divide()
+        else:
+            expected('Mulop')
 
 
 def add():
@@ -105,8 +152,11 @@ def subtract():
 
 
 def expression():
-    term()
-    while _look in ['+', '-']:
+    if is_addop(_look):
+        emit_ln('CLR D0')
+    else:
+        term()
+    while is_addop(_look):
         emit_ln('MOVE D0,-(SP)')
         if _look == '+':
             add()

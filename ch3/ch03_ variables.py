@@ -138,7 +138,7 @@ def subtract():
     match('-')
     term()
     emit_ln('SUB (SP)+,D0')
-    emit_ln('NEG D0');
+    emit_ln('NEG D0')
 
 
 def expression():
