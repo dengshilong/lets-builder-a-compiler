@@ -54,6 +54,10 @@ def is_digit(c):
     return c >= '0' and c <= '9'
 
 
+def is_addop(c):
+    return c in ['-', '+']
+
+
 def get_name():
     """get a name"""
     global _look
