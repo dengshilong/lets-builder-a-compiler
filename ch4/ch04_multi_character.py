@@ -61,15 +61,20 @@ def is_digit(c):
 def is_addop(c):
     return c in ['-', '+']
 
+def is_al_num(c):
+    return is_alpha(c) or is_digit(c)
+
 
 def get_name():
     """get a name"""
     global _look
+    token = ''
     if not is_alpha(_look):
         expected('Name')
-    result = _look.upper()
-    get_char()
-    return result
+    while is_al_num(_look):
+        token += _look.upper()
+        get_char()
+    return token
 
 
 def get_num():
